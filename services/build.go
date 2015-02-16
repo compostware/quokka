@@ -12,7 +12,7 @@ import (
 // A service interface providing mechanisms to build Dockerfiles from input specs.
 type BuildService interface {
 	// Builds a Dockerfile from an inputted spec and writes the results to an output file.
-	Build(input *io.Reader, output *io.Writer)
+	Build(input io.Reader, output io.Writer)
 }
 
 // A constuctor method for creating a new BuildService.
@@ -30,7 +30,7 @@ type builder struct {
 	emitter emit.Emitter
 }
 
-func (b *builder) Build(input *io.Reader, output *io.Writer) {
+func (b *builder) Build(input io.Reader, output io.Writer) {
 	fmt.Println("Building...")
 	
 	// parse

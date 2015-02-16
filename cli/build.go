@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"io"
+	"os"
 	"github.com/compostware/quokka/services"
 )
 
@@ -24,6 +24,10 @@ type buildCmd struct {
 	builder services.BuildService
 }
 
+type buildCmdArgs struct {
+	inputFilename, outputFilename string
+}
+
 func (*buildCmd) Key() string {
 	return buildCmdKey
 }
@@ -33,13 +37,37 @@ func (*buildCmd) Description() string {
 }
 
 func (cmd *buildCmd) Execute(args []string) {
-	var input *io.Reader = nil // TODO
-	var output *io.Writer = nil // TODO
+	cmdArgs := parseArgs(args)
 	
-	cmd.builder.Build(input, output)
+	inputFile, err := os.Open(cmdArgs.inputFilename)
+	handleErr(err)
+	defer inputFile.Close()
+	
+	outputFile, err := os.Create(cmdArgs.outputFilename)
+	handleErr(err)
+	defer outputFile.Close()
+	
+	cmd.builder.Build(inputFile, outputFile)
+}
+
+func parseArgs(args []string) (parsed *buildCmdArgs) {
+	if len(args) != 2 {
+		os.Exit(1)
+	}
+	
+	parsed = new(buildCmdArgs)
+	parsed.inputFilename = args[0]
+	parsed.outputFilename = args[1]
+	return
 }
 
 func (*buildCmd) PrintUsage() {
 	// TODO
+}
+
+func handleErr(err error) {
+	if (err != nil) {
+		panic(err)
+	}
 }
 

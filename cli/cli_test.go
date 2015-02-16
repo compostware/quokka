@@ -10,8 +10,8 @@ const (
 	desc = "desc1"
 )
 
-func TestRegisterCmd() {
-	target := new CmdHandler()
+func TestRegisterCmd(t *testing.T) {
+	target := initCmdHandler()
 	cmd := createStubCmd(key, desc)
 	
 	target.RegisterCmd(cmd)
@@ -24,8 +24,8 @@ func TestRegisterCmd() {
 
 
 func createStubCmd(key, desc string) *stubCmd {
-	stubCmd = stubCmd{key: key, desc: desc}
-	return &stubCmd
+	cmd := stubCmd{key: key, desc: desc}
+	return &cmd
 }
 
 type stubCmd struct {
@@ -43,7 +43,7 @@ func (*stubCmd) Description() string {
 }
 
 func (cmd *stubCmd) Execute(args []string) {
-	output = strings.Join(args, "-")
+	cmd.output = strings.Join(args, "-")
 }
 
 func (*stubCmd) PrintUsage() {

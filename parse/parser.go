@@ -8,7 +8,7 @@ import (
 // An interface encapsulating the logic for the parsing raw input into a Spec.
 type Parser interface {
 	// Reads and parses the given input, generating a Spec.
-	Parse(input *io.Reader) *model.Spec
+	Parse(input io.Reader) *model.Spec
 }
 
 // Constructor method for obtaining a reference to a Parser.
@@ -21,7 +21,7 @@ type parser struct {
 	
 }
 
-func (*parser) Parse(input *io.Reader) *model.Spec {
+func (*parser) Parse(input io.Reader) *model.Spec {
 	s := new(model.Spec)
 	return s
 }

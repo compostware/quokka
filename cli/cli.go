@@ -34,9 +34,14 @@ type CmdHandler interface {
 
 // Constructor method for a new CmdHandler.
 func NewCmdHandler() CmdHandler {
+	h := initCmdHandler()
+	h.RegisterCmd(NewBuildCmd())
+	return h
+}
+
+func initCmdHandler() *cmdHandler {
 	h := new(cmdHandler)
 	h.cmds = make(map[string]Cmd)
-	h.RegisterCmd(NewBuildCmd())
 	return h
 }
 
