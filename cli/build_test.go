@@ -2,8 +2,7 @@ package cli
 
 import (
 	"bytes"
-	"fmt"
-    "io"
+	"io"
     "io/ioutil"
     "os"
     "path"
@@ -12,8 +11,8 @@ import (
 )
 
 const (
-	inputFileName = "input.txt"
-	outputFileName = "output.txt"
+	inputFileName = "input"
+	outputFileName = "output"
 	inputText = "turgid existence"
 )
 
@@ -29,7 +28,7 @@ func TestForValidInputAndOutputFiles(t *testing.T) {
 	inputPath := path.Join(dir, inputFileName)
 	outputPath := path.Join(dir, outputFileName)
 	
-	err = ioutil.WriteFile(inputPath, inputData, os.ModeTemporary)
+	err = ioutil.WriteFile(inputPath, inputData, os.ModeTemporary | os.ModePerm)
 	checkErr(err)
 	
 	target := createTestCommand()
@@ -40,9 +39,6 @@ func TestForValidInputAndOutputFiles(t *testing.T) {
 	
 	outputData, err := ioutil.ReadFile(outputPath)
 	checkErr(err)
-	
-	fmt.Printf("input: %\n", string(inputData))
-	fmt.Printf("output: %\n", string(outputData))
 	
 	if bytes.Compare(inputData[:], outputData[:]) != 0 {
 		t.Errorf("Input file not correctly written to outputfile")
