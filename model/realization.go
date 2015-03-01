@@ -26,7 +26,7 @@ import (
 // complete set of concrete and consistent components that satisfy a developer's initial requirements.
 type Realization struct {
 	// The set of components referenced by this realization in dependency order.
-	Components []ComponentReference
+	Components []*ComponentReference
 	// The fragment associated with this realization.
 	Fragment string
 }

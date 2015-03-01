@@ -17,6 +17,7 @@
 package library
 
 import (
+	"fmt"
 	"github.com/compostware/quokka/model"
 )
 
@@ -24,9 +25,9 @@ import (
 type LibraryClient interface {
 	// Publishes a component to the library. This component might overwrite an existing component with the
 	// same unique identifier.
-	Publish(component *model.Component)
+	Publish(component *model.Component) error
 	// Retrieves a component from the library by its unique identifier.
-	Retrieve(componentId string) *model.Component
+	Retrieve(componentId string) (*model.Component, error)
 }
 
 // Constructor method for obtaining a reference to a LibraryClient.
@@ -42,12 +43,18 @@ type inMemoryLibrary struct {
 	components map[string]*model.Component
 }
 
-func (lib *inMemoryLibrary) Publish(component *model.Component) {
+// Impl of LibraryClient.Publish for inMemoryLibrary.
+func (lib *inMemoryLibrary) Publish(component *model.Component) error {
 	lib.components[component.Id] = component
+	return nil
 }
 
-func (lib *inMemoryLibrary) Retrieve(componentId string) *model.Component {
-	return lib.components[componentId]
-	
+// Impl of LibraryClient.Retrieve for inMemoryLibrary.
+func (lib *inMemoryLibrary) Retrieve(componentId string) (comp *model.Component, err error) {
+	comp = lib.components[componentId]
+	if comp == nil {
+		err = fmt.Errorf("No such component with id %s", componentId)
+	}
+	return
 }
 
