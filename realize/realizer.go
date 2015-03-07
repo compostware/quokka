@@ -24,7 +24,7 @@ import (
 // An interface encapsulating the logic for the transformation of an abstract spec into a concreate realization.
 type Realizer interface {
 	// Realizes a given Spec, generating a Realization. 
-	Realize(spec *model.Spec) (*model.Realization, error)
+	Realize(spec *model.Spec) (model.Realization, error)
 }
 
 // Constructor method for obtaining a reference to a Realizer.
@@ -37,8 +37,8 @@ type realizer struct {
 	
 }
 
-func (* realizer) Realize(spec *model.Spec) (*model.Realization, error) {
-	r := new(model.Realization)
+func (* realizer) Realize(spec *model.Spec) (model.Realization, error) {
+	r := model.NewRealization()
 	return r, nil
 }
 

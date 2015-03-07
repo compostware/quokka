@@ -30,15 +30,28 @@ type LibraryClient interface {
 	Retrieve(componentId string) (*model.Component, error)
 }
 
+// A simple initial library (and client) implementation that stores components in memory in a map, keyed by
+// id.
+type InMemoryLibrary interface {
+	// Inherit LibraryClient.
+	LibraryClient
+	// Purges the library of its contents.
+	Clear()
+}
+
 // Constructor method for obtaining a reference to a LibraryClient.
 func NewLibraryClient() LibraryClient {
+	return NewInMemoryLibrary()
+}
+
+// Constructor method for obtaining a reference to an in-memory impl of LibraryClient.
+func NewInMemoryLibrary() InMemoryLibrary {
 	lib := new(inMemoryLibrary)
-	lib.components = make(map[string]*model.Component)
+	lib.initComponents()
 	return lib
 }
 
-// A simple initial library (and client) implementation that stores components in memory in a map, keyed by
-// id.
+// Impl of InMemoryLibrary.
 type inMemoryLibrary struct {
 	components map[string]*model.Component
 }
@@ -56,5 +69,15 @@ func (lib *inMemoryLibrary) Retrieve(componentId string) (comp *model.Component,
 		err = fmt.Errorf("No such component with id %s", componentId)
 	}
 	return
+}
+
+// Impl of InMemoryLibrary.Clear for inMemoryLibrary.
+func (lib *inMemoryLibrary) Clear() {
+	lib.initComponents()
+}
+
+// Impl of InMemoryLibrary.Clear for inMemoryLibrary.
+func (lib *inMemoryLibrary) initComponents() {
+	lib.components = make(map[string]*model.Component)
 }
 

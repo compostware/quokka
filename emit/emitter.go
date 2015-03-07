@@ -18,6 +18,7 @@ package emit
 
 import (
 	"io"
+	"strings"
 	"github.com/compostware/quokka/library"
 	"github.com/compostware/quokka/model"
 )
@@ -25,16 +26,11 @@ import (
 // An interface encapsulating the logic for the emission of a Realization as a Dockerfile.
 type Emitter interface {
 	// Emits the given realization to the given output writer.
-	Emit(realization *model.Realization, output io.Writer) error
+	Emit(realization model.Realization, output io.Writer) error
 }
 
 type emitter struct {
 	library library.LibraryClient
-}
-
-type emittingWriter struct {
-	output io.Writer
-	err error
 }
 
 // Constructor method for obtaining a reference to a Emitter.
@@ -44,17 +40,17 @@ func NewEmitter(library library.LibraryClient) Emitter {
 	return e
 }
 
-func (e *emitter) Emit(realization *model.Realization, output io.Writer) (err error) {
-	err = e.emitComponents(realization.Components, output)
+func (e *emitter) Emit(realization model.Realization, output io.Writer) (err error) {
+	err = e.emitComponents(realization.Components(), output)
 	if err != nil {
 		return
 	}
 	
-	err = e.emitFragment(realization.Fragment, output)
+	err = e.emitFragment(realization.Fragment(), output)
 	return
 }
 
-func (e *emitter) emitComponents(refs []*model.ComponentReference, output io.Writer) error {
+func (e *emitter) emitComponents(refs []model.ComponentReference, output io.Writer) error {
 	if refs == nil {
 		return nil
 	}
@@ -69,8 +65,8 @@ func (e *emitter) emitComponents(refs []*model.ComponentReference, output io.Wri
 	return nil
 }
 
-func (e *emitter) emitComponent(ref *model.ComponentReference, output io.Writer) error {
-	compId := ref.ComponentId
+func (e *emitter) emitComponent(ref model.ComponentReference, output io.Writer) error {
+	compId := ref.ComponentId()
 	
 	comp, err := e.library.Retrieve(compId)
 	if err != nil {
@@ -83,6 +79,10 @@ func (e *emitter) emitComponent(ref *model.ComponentReference, output io.Writer)
 func (e *emitter) emitFragment(fragment string, output io.Writer) error {
 	if len(fragment) == 0 {
 		return nil
+	}
+	
+	if !strings.HasSuffix(fragment, "\n") {
+		fragment += "\n"
 	}
 	
 	_, err := io.WriteString(output, fragment)
