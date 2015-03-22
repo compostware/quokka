@@ -83,9 +83,10 @@ type stubBuildService struct {
 	
 }
 
-func (*stubBuildService) Build(input io.Reader, output io.Writer) {
+func (*stubBuildService) Build(input io.Reader, output io.Writer) error {
 	// stub services writes read input into output writer
-	io.Copy(output, input)
+	_, err := io.Copy(output, input)
+	return err
 }
 
 func checkErr(err error) {

@@ -17,6 +17,7 @@
 package library
 
 import (
+	"fmt"
 	"github.com/compostware/quokka/model"
 )
 
@@ -24,30 +25,59 @@ import (
 type LibraryClient interface {
 	// Publishes a component to the library. This component might overwrite an existing component with the
 	// same unique identifier.
-	Publish(component *model.Component)
+	Publish(component *model.Component) error
 	// Retrieves a component from the library by its unique identifier.
-	Retrieve(componentId string) *model.Component
-}
-
-// Constructor method for obtaining a reference to a LibraryClient.
-func NewLibraryClient() LibraryClient {
-	lib := new(inMemoryLibrary)
-	lib.components = make(map[string]*model.Component)
-	return lib
+	Retrieve(componentId string) (*model.Component, error)
 }
 
 // A simple initial library (and client) implementation that stores components in memory in a map, keyed by
 // id.
+type InMemoryLibrary interface {
+	// Inherit LibraryClient.
+	LibraryClient
+	// Purges the library of its contents.
+	Clear()
+}
+
+// Constructor method for obtaining a reference to a LibraryClient.
+func NewLibraryClient() LibraryClient {
+	return NewInMemoryLibrary()
+}
+
+// Constructor method for obtaining a reference to an in-memory impl of LibraryClient.
+func NewInMemoryLibrary() InMemoryLibrary {
+	lib := new(inMemoryLibrary)
+	lib.initComponents()
+	return lib
+}
+
+// Impl of InMemoryLibrary.
 type inMemoryLibrary struct {
 	components map[string]*model.Component
 }
 
-func (lib *inMemoryLibrary) Publish(component *model.Component) {
+// Impl of LibraryClient.Publish for inMemoryLibrary.
+func (lib *inMemoryLibrary) Publish(component *model.Component) error {
 	lib.components[component.Id] = component
+	return nil
 }
 
-func (lib *inMemoryLibrary) Retrieve(componentId string) *model.Component {
-	return lib.components[componentId]
-	
+// Impl of LibraryClient.Retrieve for inMemoryLibrary.
+func (lib *inMemoryLibrary) Retrieve(componentId string) (comp *model.Component, err error) {
+	comp = lib.components[componentId]
+	if comp == nil {
+		err = fmt.Errorf("No such component with id %s", componentId)
+	}
+	return
+}
+
+// Impl of InMemoryLibrary.Clear for inMemoryLibrary.
+func (lib *inMemoryLibrary) Clear() {
+	lib.initComponents()
+}
+
+// Impl of InMemoryLibrary.Clear for inMemoryLibrary.
+func (lib *inMemoryLibrary) initComponents() {
+	lib.components = make(map[string]*model.Component)
 }
 

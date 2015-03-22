@@ -29,7 +29,7 @@ type Cmd interface {
 	Description() string
 	// Executes this command with the given array of arguments. These arguments will not contain: the command key; or
 	// the CLI executable.
-	Execute(args []string)
+	Execute(args []string) error
 	// Print the usage of flags, arguments etc. for this command.
 	PrintUsage()
 }
@@ -96,13 +96,21 @@ func (h *cmdHandler) HandleCmd(key string, args []string) {
 		return
 	}
 	
-	cmd.Execute(args)
+	err := cmd.Execute(args)
+	if err != nil {
+		h.handleError(err)
+	}
 }
 
 // Prints the given message with an error, accompanied by a print-out of general usage for the CLI..
 func (h *cmdHandler) handleUsageError(message string) {
 	fmt.Println(message)
 	h.PrintUsage()
+}
+
+// Prints the given message with an error, accompanied by a print-out of general usage for the CLI..
+func (h *cmdHandler) handleError(err error) {
+	fmt.Println(err)
 }
 
 

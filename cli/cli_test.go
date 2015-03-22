@@ -58,8 +58,9 @@ func (*stubCmd) Description() string {
 	return desc
 }
 
-func (cmd *stubCmd) Execute(args []string) {
+func (cmd *stubCmd) Execute(args []string) error {
 	cmd.output = strings.Join(args, "-")
+	return nil
 }
 
 func (*stubCmd) PrintUsage() {

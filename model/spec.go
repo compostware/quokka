@@ -48,7 +48,7 @@ func (spec *Spec) Fragment() string  {
 }
 
 // Adds a new requirement to this spec.
-func (spec *Spec) AddRequired(req Requirement) {
+func (spec *Spec) AddRequirement(req Requirement) {
 	spec.requires = append(spec.requires, req) 
 }
 

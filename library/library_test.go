@@ -31,8 +31,11 @@ const (
 func TestPublishNewComponent(t *testing.T) {
 	lib := buildTargetLibWithCompAPublished()
 	
-	result := lib.Retrieve(compIdA)
-	if result == nil {
+	result, err := lib.Retrieve(compIdA)
+	
+	if err != nil {
+		t.Errorf("Unexpected error received %s", err)
+	} else if result == nil {
 		t.Error("Publish failed, nil returned by retrieve")
 	} else if result.Id != compIdA || result.Fragment != compFragA {
 		t.Errorf("Publish failed, expected (%s,%s) but got (%s, %s)", 
@@ -45,10 +48,15 @@ func TestRePublishComponent(t *testing.T) {
 	lib := buildTargetLibWithCompAPublished()
 	
 	compA2 := model.NewComponent(compIdA, compFragB)
-	lib.Publish(compA2)
+	err := lib.Publish(compA2)
 	
-	result := lib.Retrieve(compIdA)
-	if result.Id != compIdA || result.Fragment != compFragB {
+	result, err := lib.Retrieve(compIdA)
+	
+	if err != nil {
+		t.Errorf("Unexpected error received %s", err)
+	} else if result == nil {
+		t.Error("Re-Publish failed, nil returned by retrieve")
+	} else if result.Id != compIdA || result.Fragment != compFragB {
 		t.Errorf("Re-Publish failed, expected (%s,%s) but got (%s, %s)", 
 			compIdA, compFragB,
 			result.Id, result.Fragment)
@@ -58,9 +66,12 @@ func TestRePublishComponent(t *testing.T) {
 func TestRetrieveNonExistentComponent(t *testing.T) {
 	lib := buildTargetLibWithCompAPublished()
 	
-	result := lib.Retrieve(compIdB)
-	if result != nil {
-		t.Error("Retrieve failed, expected nil but got (%s,%s)",  
+	result, err := lib.Retrieve(compIdB)
+	
+	if err == nil {
+		t.Error("Error expected, none received")
+	} else if result != nil {
+		t.Errorf("Retrieve failed, expected nil but got (%s,%s)",  
 			result.Id, result.Fragment)
 	}
 }

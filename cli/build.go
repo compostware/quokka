@@ -17,6 +17,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 	"github.com/compostware/quokka/services"
 )
@@ -52,38 +53,40 @@ func (*buildCmd) Description() string {
 	return buildCmdDesc
 }
 
-func (cmd *buildCmd) Execute(args []string) {
-	cmdArgs := parseArgs(args)
+func (cmd *buildCmd) Execute(args []string) error {
+	cmdArgs, err := parseArgs(args)
+	if err != nil {
+		return err
+	}
 	
 	inputFile, err := os.Open(cmdArgs.inputFilename)
-	handleErr(err)
+	if err != nil {
+		return err
+	}
 	defer inputFile.Close()
 	
 	outputFile, err := os.Create(cmdArgs.outputFilename)
-	handleErr(err)
+	if err != nil {
+		return err
+	}
 	defer outputFile.Close()
 	
-	cmd.builder.Build(inputFile, outputFile)
+	return cmd.builder.Build(inputFile, outputFile)
 }
 
-func parseArgs(args []string) (parsed *buildCmdArgs) {
+func parseArgs(args []string) (*buildCmdArgs, error) {
 	if len(args) != 2 {
-		os.Exit(1)
+		return nil, fmt.Errorf("Insufficient number of arguments for build command: %n", len(args))
 	}
 	
-	parsed = new(buildCmdArgs)
+	parsed := new(buildCmdArgs)
 	parsed.inputFilename = args[0]
 	parsed.outputFilename = args[1]
-	return
+	
+	return parsed, nil
 }
 
 func (*buildCmd) PrintUsage() {
 	// TODO
-}
-
-func handleErr(err error) {
-	if (err != nil) {
-		panic(err)
-	}
 }
 

@@ -20,6 +20,7 @@ package services
 import (
 	"fmt"
 	"io"
+	"github.com/compostware/quokka/library"
 	"github.com/compostware/quokka/parse"
 	"github.com/compostware/quokka/realize"
 	"github.com/compostware/quokka/emit"
@@ -29,15 +30,17 @@ import (
 // A service interface providing mechanisms to build Dockerfiles from input specs.
 type BuildService interface {
 	// Builds a Dockerfile from an inputted spec and writes the results to an output file.
-	Build(input io.Reader, output io.Writer)
+	Build(input io.Reader, output io.Writer) error
 }
 
 // A constuctor method for creating a new BuildService.
 func NewBuildService() BuildService {
+	l := library.NewLibraryClient()
+	
 	b := new(builder)
 	b.parser = parse.NewParser()
 	b.realizer = realize.NewRealizer()
-	b.emitter = emit.NewEmitter()
+	b.emitter = emit.NewEmitter(l)
 	return b
 }
 
@@ -47,16 +50,23 @@ type builder struct {
 	emitter emit.Emitter
 }
 
-func (b *builder) Build(input io.Reader, output io.Writer) {
+func (b *builder) Build(input io.Reader, output io.Writer) error {
 	fmt.Println("Building...")
 	
 	// parse
-	spec := b.parser.Parse(input)
+	spec, err := b.parser.Parse(input)
+	if err != nil {
+		return err
+	}
 	
 	// realize
-	realization := b.realizer.Realize(spec)
+	realization, err := b.realizer.Realize(spec)
+	if err != nil {
+		return err
+	}
 	
 	// emit
-	b.emitter.Emit(realization, output)
+	err = b.emitter.Emit(realization, output)
+	return err
 }
 
