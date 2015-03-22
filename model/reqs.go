@@ -23,15 +23,27 @@ type Requirement interface {
 	
 }
 
-// A requirement for a specific identified service.
+// A requirement for a specific type of service.
 type RequiredService struct {
 	ServiceId string
 }
 
+// A requirement for a specific identified component that may provide one or more services.
+type RequiredComponent struct {
+	ComponentId string
+}
+
 // A constructor method for required services.
-func NewRequiredService(serviceId string) (req *RequiredService) {
-	req = new(RequiredService)
+func NewRequiredService(serviceId string) *RequiredService {
+	req := new(RequiredService)
 	req.ServiceId = serviceId
-	return
+	return req
+}
+
+// A constructor method for required components.
+func NewRequiredComponent(componentId string) *RequiredComponent {
+	req := new(RequiredComponent)
+	req.ComponentId = componentId
+	return req
 }
 
